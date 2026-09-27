@@ -138,21 +138,24 @@ async def tick(body: TickBody):
             continue
             
         provider = None
-        groq_key = os.environ.get("GROQ_API_KEY")
-        openai_key = os.environ.get("OPENAI_API_KEY")
-        gemini_key = os.environ.get("GEMINI_API_KEY")
-        
-        if groq_key:
-            from composer import GroqProvider
-            provider = GroqProvider(groq_key)
-        elif openai_key:
-            from composer import OpenAIProvider
-            provider = OpenAIProvider(openai_key)
-        elif gemini_key:
-            from composer import GeminiProvider
-            provider = GeminiProvider(gemini_key)
+        bot_mode = os.environ.get("BOT_MODE", "llm").lower()
+        if bot_mode != "deterministic":
+            groq_key = os.environ.get("GROQ_API_KEY")
+            openai_key = os.environ.get("OPENAI_API_KEY")
+            gemini_key = os.environ.get("GEMINI_API_KEY")
+            
+            if groq_key:
+                from composer import GroqProvider
+                provider = GroqProvider(groq_key)
+            elif openai_key:
+                from composer import OpenAIProvider
+                provider = OpenAIProvider(openai_key)
+            elif gemini_key:
+                from composer import GeminiProvider
+                provider = GeminiProvider(gemini_key)
             
         composed = compose(cat, mch, trg, cust, provider)
+
         
         actions.append({
             "conversation_id": conv_id,
@@ -241,20 +244,23 @@ async def reply(body: ReplyBody):
         }
         
     # Default fallback
-    groq_key = os.environ.get("GROQ_API_KEY")
-    openai_key = os.environ.get("OPENAI_API_KEY")
-    gemini_key = os.environ.get("GEMINI_API_KEY")
     llm = None
-    
-    if groq_key:
-        from composer import GroqProvider
-        llm = GroqProvider(groq_key)
-    elif openai_key:
-        from composer import OpenAIProvider
-        llm = OpenAIProvider(openai_key)
-    elif gemini_key:
-        from composer import GeminiProvider
-        llm = GeminiProvider(gemini_key)
+    bot_mode = os.environ.get("BOT_MODE", "llm").lower()
+    if bot_mode != "deterministic":
+        groq_key = os.environ.get("GROQ_API_KEY")
+        openai_key = os.environ.get("OPENAI_API_KEY")
+        gemini_key = os.environ.get("GEMINI_API_KEY")
+        
+        if groq_key:
+            from composer import GroqProvider
+            llm = GroqProvider(groq_key)
+        elif openai_key:
+            from composer import OpenAIProvider
+            llm = OpenAIProvider(openai_key)
+        elif gemini_key:
+            from composer import GeminiProvider
+            llm = GeminiProvider(gemini_key)
+
         
     if llm:
         prompt = f"Merchant says: '{body.message}'. You are Vera, the AI assistant. Reply briefly confirming you understand."
