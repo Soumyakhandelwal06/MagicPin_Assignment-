@@ -20,17 +20,30 @@ Author: magicpin AI Challenge Team
 # ██████  CONFIGURATION - EDIT THIS SECTION ██████
 # =============================================================================
 
+import os
+import sys
+
+# Auto-load .env file if present
+if os.path.exists(".env"):
+    with open(".env") as _f:
+        for _line in _f:
+            _line = _line.strip()
+            if _line and not _line.startswith("#") and "=" in _line:
+                _k, _v = _line.split("=", 1)
+                os.environ.setdefault(_k.strip(), _v.strip().strip("'\""))
+
 # Your bot's URL (where your bot is running)
 BOT_URL = "http://localhost:8080"
 
 # Choose your LLM provider: "openai", "anthropic", "gemini", "deepseek", "groq", "ollama", "openrouter"
 LLM_PROVIDER = "groq"
 
-# Your API key (paste your key here)
-LLM_API_KEY = "YOUR_GROQ_API_KEY_HERE"  # <-- PUT YOUR API KEY HERE
+# Your API key (reads from environment variable if available)
+LLM_API_KEY = os.environ.get("GROQ_API_KEY") or os.environ.get("LLM_API_KEY") or "YOUR_GROQ_API_KEY_HERE"
+
 
 # Model to use (leave empty for default, or specify like "gpt-4o", "claude-3-5-sonnet-20241022", etc.)
-LLM_MODEL = "qwen/qwen3.8-27b"  # <-- Optional: specify model or leave empty for default
+LLM_MODEL = "qwen/qwen3.8-27b"  # <-- Groq model
 
 # For Ollama only: local server URL
 OLLAMA_URL = "http://localhost:11434"
@@ -42,8 +55,6 @@ TEST_SCENARIO = "all"
 # ██████  END OF CONFIGURATION - DON'T EDIT BELOW THIS LINE ██████
 # =============================================================================
 
-import os
-import sys
 import json
 import time
 import re

@@ -1,5 +1,15 @@
 import os
 import time
+
+# Auto-load .env file if present
+if os.path.exists(".env"):
+    with open(".env") as _f:
+        for _line in _f:
+            _line = _line.strip()
+            if _line and not _line.startswith("#") and "=" in _line:
+                _k, _v = _line.split("=", 1)
+                os.environ.setdefault(_k.strip(), _v.strip().strip("'\""))
+
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -7,6 +17,7 @@ from fastapi import FastAPI, Request, HTTPException, status
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 import logging
+
 
 from engine import get_contexts, evaluate_triggers, suppressed_keys, suppressed_conversations
 from composer import compose
